@@ -1,0 +1,2 @@
+CREATE  DATABASE  IF NOT EXISTS turistando;
+CREATE  DATABASE  IF NOT EXISTS turistando_test;
