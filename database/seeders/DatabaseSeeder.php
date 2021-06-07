@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            AttractionSeeder::class
+            AttractionSeeder::class,
+            PhotoAttractionSeeder::class
         ]);
 
          \App\Models\User::factory(10)->create();

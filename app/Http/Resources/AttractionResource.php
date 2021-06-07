@@ -16,6 +16,7 @@ class AttractionResource extends JsonResource
     {
         $model = parent::toArray($request);
         $model['coordinates'] = \json_decode($model['coordinates']);
+        $model['photos'] = PhotosAttractionResource::collection($this->photos);
         return $model;
     }
 }
