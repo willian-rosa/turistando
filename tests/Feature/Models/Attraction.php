@@ -14,7 +14,17 @@ class Attraction extends TestCase
         $attraction = $attractions->first();
 
         $this->assertIsString($attraction->name);
-        $this->assertCount(2,$attraction->photos);
+        $this->assertCount(3,$attraction->photos);
+
+    }
+
+    public function testFindVideos()
+    {
+        $attractions = \App\Models\Attraction::all();
+        $attraction = $attractions->first();
+
+        $this->assertIsString($attraction->name);
+        $this->assertCount(1,$attraction->videos);
 
     }
 }

@@ -7,25 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Attraction extends Model
+class VideoAttraction extends Model
 {
     use HasFactory, SoftDeletes, Uuid;
 
-    protected $fillable = ['name', 'description', 'coordinates'];
+    protected $fillable = ['name', 'url'];
     protected $dates = ['deleted_at'];
     protected $casts = [
         'id' => 'string',
     ];
 
     public $incrementing = false;
-
-    public function photos()
-    {
-        return $this->hasMany(PhotoAttraction::class)->withTrashed();
-    }
-
-    public function videos()
-    {
-        return $this->hasMany(VideoAttraction::class)->withTrashed();
-    }
 }

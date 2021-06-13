@@ -3,17 +3,17 @@
 namespace Database\Factories;
 
 use App\Models\Attraction;
-use App\Models\PhotoAttraction;
+use App\Models\VideoAttraction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PhotoAttractionFactory extends Factory
+class VideoAttractionFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = PhotoAttraction::class;
+    protected $model = VideoAttraction::class;
 
     /**
      * Define the model's default state.
@@ -25,7 +25,7 @@ class PhotoAttractionFactory extends Factory
         $attraction = Attraction::all()->random(1);
 
         return [
-            'name' => 'Photo: ' . $this->faker->streetName,
+            'name' => 'Video: ' . $this->faker->streetName,
             'url' => $this->faker->imageUrl(),
             'attraction_id' => $attraction[0]['id']
         ];
