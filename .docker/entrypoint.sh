@@ -4,8 +4,15 @@
 
 #RUN chown -R www-data:www-data /var/www
 #
-#composer install
 #
+
+cd resources/site
+npm install
+npm run build
+
+cd ../..
+composer install
+
 php artisan key:generate
 php artisan migrate
 

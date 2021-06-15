@@ -6,6 +6,7 @@ services:
     container_name: turistando_nginx
     tty: true
     ports:
+      - "8080:8080"
       - "80:80"
     volumes:
       - .:/var/www
