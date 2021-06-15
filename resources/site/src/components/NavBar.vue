@@ -10,6 +10,7 @@
         >Estabelecimentos & Serviços</router-link
       >
     </ul>
+	br
     <div class="centralizar" id="menu">
       <b-button class="bg-transparent border-0" v-b-toggle.sidebar-1
         ><b-icon icon="list" font-scale="2"></b-icon
