@@ -24,6 +24,7 @@ services:
       -timeout 40s
       ./.docker/entrypoint.sh
     environment:
+      - _APP_ENV=prodution
       - _DB_HOST=turistando_db
       - _DB_DATABASE=turistando
       - _DB_USERNAME=root
