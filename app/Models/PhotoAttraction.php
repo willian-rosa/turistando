@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PhotoAttraction extends Model
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory, SoftDeletes, Uuid;
 
     protected $fillable = ['name', 'url'];

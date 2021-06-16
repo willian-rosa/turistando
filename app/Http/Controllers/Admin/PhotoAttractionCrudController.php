@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\AttractionRequest;
+use App\Http\Requests\PhotoAttractionRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class AttractionCrudController
+ * Class PhotoAttractionCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class AttractionCrudController extends CrudController
+class PhotoAttractionCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -26,9 +26,9 @@ class AttractionCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Attraction::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/attraction');
-        CRUD::setEntityNameStrings('ponto turístico', 'Ponto Turístico');
+        CRUD::setModel(\App\Models\PhotoAttraction::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/photoattraction');
+        CRUD::setEntityNameStrings('foto ponto turístico', 'Fotos Ponto Turístico');
     }
 
     /**
@@ -40,7 +40,8 @@ class AttractionCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name')->label('Nome');
-        CRUD::column('description')->label('Descrição');
+        CRUD::column('url')->label('Url');;
+
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -56,11 +57,10 @@ class AttractionCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(AttractionRequest::class);
+        CRUD::setValidation(PhotoAttractionRequest::class);
 
         CRUD::field('name')->label('Nome');
-        CRUD::field('description')->type('ckeditor')->label('Descrição');
-        CRUD::field('coordinates')->label('Coordenadas');
+        CRUD::field('url')->type('image')->label('Url');
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
