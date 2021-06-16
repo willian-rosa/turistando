@@ -8,6 +8,8 @@ import Elementos from './components/Elementos.vue'
 import Teste from './components/Teste.vue'
 import Estabelecimentos from './components/Estabelecimentos.vue'
 import VueHorizontal from 'vue-horizontal';
+import * as VueGoogleMaps from 'vue2-google-maps'
+
 
 import './registerServiceWorker'
 
@@ -16,14 +18,20 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+Vue.use(VueGoogleMaps,{
+  load:{
+    key:'AIzaSyBvb87D9piABnnlhDHR3xg8oiSvMq2vE_I',
+    libraries: 'places',
+  }
+})
 Vue.use(VueHorizontal);
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.config.productionTip = false
-
 Vue.use(VueRouter)
+
 const routes = [
-  { path: '/eventos', component: Eventos },
+  { path: '/', component: Eventos },
   { path: '/elementos', component: Elementos },
   { path: '/list', component: List },
   { path: '/teste', component: Teste },

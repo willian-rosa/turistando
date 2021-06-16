@@ -1,164 +1,219 @@
+<script
+  async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvb87D9piABnnlhDHR3xg8oiSvMq2vE_I&callback=initMap"
+></script>
 <template>
   <main>
-    <!-- <div class="header">
-      <h3>Top Stories (Slanted)</h3>
-      <p>Responsive sizing, relative to the viewport. Fixed once the viewport width gets too small.</p>
-    </div> -->
-
-    <vue-horizontal class="horizontal">
-      <div class="item" v-for="item in items" :key="item.id">
-        <div class="card">
-          <div class="wrapper">
-            <div class="image" :style="{background: `url(${item.imagem})`}"></div>
-            <div class="date">1 week ago</div>
-          </div>
+    <div style="margin-bottom:5px;">
+      <vue-horizontal
+        ref="horizontal"
+        class="horizontal"
+        :button="false"
+        @scroll-debounce="onScrollDebounce"
+      >
+        <div class="item" v-for="item in items" :key="item.id" @click="goElemetos(item)">
+          <div class="image" :style="{ background: `url(${item.photos[0].url})` }"></div>
           <div class="content">
-            <div>
-              <div class="brand">
-                <svg class="icon" viewBox="0 0 24 24">
-                  <path
-                    d="M19,5v14H5V5H19 M19,3H5C3.9,3,3,3.9,3,5v14c0,1.1,0.9,2,2,2h14c1.1,0,2-0.9,2-2V5C21,3.9,20.1,3,19,3L19,3z"/>
-                  <path d="M14,17H7v-2h7V17z M17,13H7v-2h10V13z M17,9H7V7h10V9z"/>
-                </svg>
-                <div class="name">{{ item.titulo }}</div>
-              </div>
-
-              <div class="title">{{ item.descricao }}</div>
-            </div>
+            <h6>{{ item.name }}</h6>
+            <p>{{ item.description }}</p>
           </div>
         </div>
-      </div>
-    </vue-horizontal>
+      </vue-horizontal>
+    </div>
+    <div class="header">
+      <nav style="justify-content: center;">
+        <button @click="prev" :class="{ active: hasPrev, inactive: !hasPrev }">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="m9.8 12 5 5a1 1 0 1 1-1.4 1.4l-5.7-5.7a1 1 0 0 1 0-1.4l5.7-5.7a1 1 0 0 1 1.4 1.4l-5 5z"
+            />
+          </svg>
+        </button>
+        <button @click="next" :class="{ active: hasNext, inactive: !hasNext }">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="m14.3 12.1-5-5a1 1 0 0 1 1.4-1.4l5.7 5.7a1 1 0 0 1 0 1.4l-5.7 5.7a1 1 0 0 1-1.4-1.4l5-5z"
+            />
+          </svg>
+        </button>
+      </nav>
+    </div>
   </main>
 </template>
 
 <script>
-
+const _atual = JSON.parse(localStorage.getItem("objeto"));
 
 export default {
   data() {
     return {
       items: [],
-      accessKey: "6V8sZsHjrXaYUXZNwbpcOzshDOBN7-IwjfArx09BHdI",
-      url: "https://api.unsplash.com/collections/72903167/photos?",
-      username:'fNeri',
-    }
+      hasPrev: false,
+      hasNext: true,
+      markers: [],
+      atual: _atual.coordinates,
+      destino: { lat: 0, lng: 0 },
+      markers: [],
+      photos: "https://via.placeholder.com/640x480.png/00dd33?text=temporibus",
+      url: "http://ec2-3-93-44-66.compute-1.amazonaws.com:8080/api/attractions",
+    };
   },
+  computed: {},
   methods: {
-    fetchClubFotos() {
-      fetch(
-        this.url +
-          `client_id=${this.accessKey}`
-      )
+    prev() {
+      this.$refs.horizontal.prev();
+    },
+    next() {
+      this.$refs.horizontal.next();
+    },
+    onScrollDebounce({ hasPrev, hasNext }) {
+      this.hasPrev = hasPrev;
+      this.hasNext = hasNext;
+    },
+    fetchApi() {
+      fetch(this.url)
         .then((response) => response.json())
         .then((json) => {
-          this.filtro(json)
+           json.data = json.data.filter(item=>{
+            if(item.photos.length!=0){
+              console.log(item.photos.length)
+              return item
+            }
+          })
+          this.items = json.data;
+          console.log(json);
         })
         .catch((err) => {
           console.log("error", err);
         });
     },
-    filtro(json) {
-      this.items = json.map(item=>{
-        var i = new Object
-        i.imagem = item.urls.small
-        i.descricao= item.description
-        i.titulo = item.alt_description.toUpperCase()
-        return i
-      })
-      console.log(this.items)
-    }
+    goElemetos(item) {
+      var obj = item
+      localStorage.setItem("objeto", JSON.stringify({ obj }));
+      this.$router.push("/elementos");
+    },
   },
-  mounted(){
-    this.fetchClubFotos()
-  }
-}
+  mounted() {
+    this.fetchApi();
+    /* this.initMap(); */
+  },
+};
 </script>
 
 <!-- Content Design -->
 <style scoped>
-.card {
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid #e2e8f0;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
+#map {
+  height: 500px;
+  width: 500px;
+  background-color: #d3d3d3;
 }
-
-.wrapper {
-  position: relative;
+.bodyRotas {
+  padding-left: 10vw;
+  padding-right: 10vw;
 }
-
+.container {
+  background-color: #d3d3d3;
+  border: solid 2px #6059c1;
+  border-radius: 20px;
+  padding: 15px;
+}
 .image {
   background-position: center !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
-  padding-top: 60%;
-  clip-path: polygon(100% 0, 100% 85%, 0% 100%, 0 0%);
-  transition: 0.3s;
+  padding-top: 100%;
+  position: relative;
 }
 
-.card:hover .image {
-  clip-path: polygon(100% 0, 100% 82%, 0% 98%, 0 0%);
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  background: linear-gradient(
+    345deg,
+    #00000080 0,
+    #00000060 5%,
+    #00000040 20%,
+    #00000000 50%
+  );
+}
+
+.overlay .text {
+  padding: 12px;
+  line-height: 1;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
 }
 
 .content {
-  padding: 10px 16px 12px 16px;
-  max-height: 150px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  margin-top: 6px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  color: #333333;
-}
-
-.brand .icon {
-  flex-shrink: 0;
-  height: 20px;
-  width: 20px;
-  fill: currentColor;
-}
-
-.brand .name {
-  margin-left: 4px;
-  font-size: 12px;
-  font-weight: 700;
+.content h6 {
+  font-size: 14px;
+  text-transform: capitalize;
   line-height: 1.5;
 }
 
-.title {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.6;
-  margin-top: 8px;
+.content p {
+  line-height: 1.5;
+  font-size: 12px;
+  margin-top: 2px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.date {
-  font-size: 10px;
-  font-weight: 700;
+.header {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
   color: black;
-  line-height: 1;
-  position: absolute;
-  bottom: 0;
-  right: 12px;
+}
+
+button.inactive svg {
+  color: #bbb;
+}
+
+button {
+  padding: 4px;
+  border-radius: 100px;
+  background-color: #6059c1;
+  border: solid;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+button:focus {
+  outline: none;
 }
 </style>
 
-<!-- Parent CSS (Container) -->
+<!-- Parent CSS (.container) -->
 <style scoped>
-.header {
-  margin-bottom: 16px;
-}
-
 main {
-  padding: 24px;
+  padding: 10px;
 }
 
 @media (min-width: 768px) {
@@ -171,90 +226,55 @@ main {
 <!-- Responsive Breakpoints -->
 <style scoped>
 .horizontal {
-  --fixed: 240px;
-  --count: 1;
-  --gap: 12px;
-  --margin: 24px;
+  --count: 2;
+  --gap: 16px;
 }
 
-@media (min-width: 768px) {
-  .horizontal {
-    --count: 3;
-    --margin: 0;
+@media (max-width: 640px) {
+  .header {
+    display: none;
+  }
+  .bodyRotas {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 768px) {
+  .header {
+    display: none;
+  }
+  .bodyRotas {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+@media (min-width: 640px) {
+  .horizontal {
+    --count: 3;
+    --gap: 24px;
+  }
+}
+@media (min-width: 768px) {
   .horizontal {
     --count: 4;
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .horizontal {
-    --gap: 24px;
     --count: 5;
   }
 }
 
-@media (min-width: 1536px) {
+@media (min-width: 1280px) {
   .horizontal {
     --count: 6;
   }
 }
-</style>
 
-<!--
-## Responsive Logic
-The margin removes the padding from the parent container and add it into vue-horizontal.
-If the gap is less than margin, this causes overflow to show and peeks into the next content for better UX.
-You can replace this section entirely for basic responsive CSS logic if you don't want this "peeking" experience
-for the mobile web.
-Note that this responsive logic is hyper sensitive to your design choices, it's not a one size fit all solution.
-var() has only 95% cross browser compatibility, you should convert it to fixed values.
-
-There are 2 set of logic:
-0-768 for peeking optimized for touch scrolling.
->768 for navigation via buttons for desktop/laptop users.
--->
-<style scoped>
-@media (max-width: 767.98px) {
-  .item {
-    width: var(--fixed);
-    padding: 0 calc(var(--gap) / 2);
-  }
-
-  .item:first-child {
-    width: calc(var(--fixed) + var(--margin) - (var(--gap) / 2));
-    padding-left: var(--margin);
-  }
-
-  .item:last-child {
-    width: calc(var(--fixed) + var(--margin) - (var(--gap) / 2));
-    padding-right: var(--margin);
-  }
-
-  .item:only-child {
-    width: calc(var(--fixed) + var(--margin) * 2 - var(--gap));
-  }
-
-  .horizontal {
-    margin: 0 calc(var(--margin) * -1);
-  }
-
-  .horizontal >>> .v-hl-container {
-    scroll-padding: 0 calc(var(--margin) - (var(--gap) / 2));
-  }
-
-  .horizontal >>> .v-hl-btn {
-    display: none;
-  }
-}
-
-@media (min-width: 768px) {
-  .item {
-    width: calc((100% - ((var(--count) - 1) * var(--gap))) / var(--count));
-    margin-right: var(--gap);
-  }
+.item {
+  width: calc((100% - ((var(--count) - 1) * var(--gap))) / var(--count));
+  margin-right: var(--gap);
 }
 </style>

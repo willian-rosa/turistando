@@ -2,21 +2,22 @@
   <div class="bodyRotas">
     <br />
     <div
-      v-for="(pontoTuristico, index) of pontosTuristicos"
-      :key="index + pontoTuristico.name"
+      v-for="(estabelecimento, index) of estabelecimentos"
+      :key="index + estabelecimento.name"
     >
       <div
         class="titulo"
         @click="abrirClasse($event)"
-        :id="index + pontoTuristico.name"
+        :id="index + estabelecimento.name"
       >
-        {{pontoTuristico.name}}
+        {{ estabelecimento.name }}
       </div>
 
       <div
         v-if="
-          classeClicada == index + pontoTuristico.name && mostraClasse == true
+          classeClicada == index + estabelecimento.name && mostraClasse == true
         "
+        @click="goElementos(estabelecimento)"
       >
         <!-- <div class="checkbox">
           
@@ -24,10 +25,10 @@
         <div>
           <div class="lista">
             <div class="imagem">
-        <img class="imagem" :src="pontoTuristico.photos.url" alt="" />
+              <img class="imagem" :src="estabelecimento.photos.url" alt="" />
             </div>
             <div>
-              <div class="texto">{{ pontoTuristico.description }}</div>
+              <div class="texto">{{ estabelecimento.description }}</div>
             </div>
           </div>
         </div>
@@ -37,12 +38,11 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
-      url: "https://webhook.site/f1af49a7-f782-4c4f-a266-ec5e45cfd844",
-      pontosTuristicos: {},
+      url: "http://ec2-3-93-44-66.compute-1.amazonaws.com:8080/api/attractions",
+      estabelecimentos: {},
       mostraClasse: false,
       classeClicada: {},
     };
@@ -59,7 +59,7 @@ export default {
         });
     },
     filtro(json) {
-      this.pontosTuristicos = json;
+      this.estabelecimentos = json;
     },
     abrirClasse(evento) {
       if (this.classeClicada == evento.target.id) {
@@ -68,6 +68,15 @@ export default {
         this.mostraClasse = true;
         this.classeClicada = evento.target.id;
       }
+    },
+    goElementos(estabelecimento) {
+      var obj = estabelecimento
+      console.log(obj)
+      localStorage.setItem(
+        "objeto",
+        JSON.stringify({ obj })
+      );
+      this.$router.push('/elementos')
     },
   },
   mounted() {
@@ -102,7 +111,7 @@ export default {
   display: flex;
   padding: 5px;
 }
-.texto{
+.texto {
   margin-left: 5px;
 }
 .imagem {

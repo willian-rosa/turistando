@@ -3,13 +3,13 @@
     <br>
     <Carousel/>
     <br><br>
-    <h3 style="color: #6059c1">Mais visitados</h3>
+    <h3 style="color: #6059c1">Mais escolhidos</h3>
     <hr style="background-color: #6059c1" />
     <List/>
-    <h3 style="color: #6059c1">Mais visitados</h3>
+    <h3 style="color: #6059c1">Ultimos Adicionados</h3>
     <hr style="background-color: #6059c1" />
     <List/>
-    <h3 style="color: #6059c1">Mais visitados</h3>
+    <h3 style="color: #6059c1">Agenda Geral</h3>
     <hr style="background-color: #6059c1" />
     <List/>
 

@@ -10,16 +10,18 @@
         @click="abrirClasse($event)"
         :id="index + pontoTuristico.name"
       >
-        {{ pontoTuristico.name }}
+        <div style="padding-left:5px">{{ pontoTuristico.name }}</div>
+        <div class="km">{{distancias[index]}} km</div>
       </div>
       <div
         class="containerInformacao"
         v-if="
           classeClicada == index + pontoTuristico.name && mostraClasse == true
         "
+        @click="goElementos(pontoTuristico)"
       >
         <div class="texto">{{ pontoTuristico.description }}</div>
-        <img class="imagem" :src="pontoTuristico.photos.url" alt="" />
+        <img class="imagem" :src="pontoTuristico.photos[0].url" alt="" />
       </div>
     </div>
   </div>
@@ -29,10 +31,11 @@
 export default {
   data() {
     return {
-      url: "https://webhook.site/f1af49a7-f782-4c4f-a266-ec5e45cfd844",
+      url: "http://ec2-3-93-44-66.compute-1.amazonaws.com:8080/api/attractions",
       pontosTuristicos: {},
       mostraClasse: false,
       classeClicada: {},
+      distancias:[]
     };
   },
   methods: {
@@ -48,23 +51,27 @@ export default {
     },
     filtro(json) {
       this.pontosTuristicos = json;
+      this.geolocalizacao()
     },
     geolocalizacao() {
       if ("geolocation" in navigator) {
         console.log(
           navigator.geolocation.getCurrentPosition(
             (position) => {
-              console.log(position.coords.latitude);
-              console.log(position.coords.longitude);
-              var distancia = this.getDistanceFromLatLonInKm(
-                {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude,
-                },
-                { lat: -28.495749, lng: -48.761474 }
-              );
+              this.pontosTuristicos.forEach((ponto) => {
+                var distancia = this.getDistanceFromLatLonInKm(
+                  {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                  },
+                  { lat: ponto.coordinates.lat, lng:ponto.coordinates.lng }
+                );
 
-              console.log(distancia/1000).toFixed(1);
+                var d = distancia / 1000;
+                 d = d.toFixed(1);
+                console.log(d)
+                this.distancias.push(d)
+              });
             },
             (error) => {
               console.log(error);
@@ -100,10 +107,19 @@ export default {
         this.classeClicada = evento.target.id;
       }
     },
+    goElementos(pontoTuristico) {
+      var obj = pontoTuristico
+      console.log(obj)
+      localStorage.setItem(
+        "objeto",
+        JSON.stringify({ obj })
+      );
+      this.$router.push('/elementos')
+    },
   },
   mounted() {
     this.fetchApi();
-    this.geolocalizacao();
+
   },
 };
 </script>
@@ -115,7 +131,7 @@ export default {
 }
 .titulo {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background-color: #dcdcdc;
   color: #6059c1;
@@ -144,5 +160,9 @@ export default {
   width: 150px;
   max-width: 150px;
   max-height: 150px;
+}
+.km {
+  font-size: 12px;
+  display: flex;
 }
 </style>

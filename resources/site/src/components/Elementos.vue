@@ -1,21 +1,25 @@
+<script
+  async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvb87D9piABnnlhDHR3xg8oiSvMq2vE_I&callback=initMap"
+></script>
 <template>
   <div class="bodyRotas">
-    <main >
+    <main>
       <div class="container">
         <div style="margin-bottom:5px;">
-        <vue-horizontal
-          ref="horizontal"
-          class="horizontal"
-          :button="false"
-          @scroll-debounce="onScrollDebounce"
-        >
-          <div class="item" v-for="item in items" :key="item.id">
-            <div
-              class="image"
-              :style="{ background: `url(${item.photos.url})` }"
-            ></div>
-          </div>
-        </vue-horizontal>
+          <vue-horizontal
+            ref="horizontal"
+            class="horizontal"
+            :button="false"
+            @scroll-debounce="onScrollDebounce"
+          >
+            <div class="item" v-for="item in items" :key="item.id">
+              <div
+                class="image"
+                :style="{ background: `url(${item.url})` }"
+              ></div>
+            </div>
+          </vue-horizontal>
         </div>
         <div class="header">
           <nav style="justify-content: center;">
@@ -43,15 +47,25 @@
         </div>
 
         <div>
-          What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing
-          and typesetting industry. Lorem Ipsum has been the industry's standard
-          dummy text ever since the 1500s, when an unknown printer took a galley
-          of type and scrambled it to make a type specimen book. It has survived
-          not only five centuries, but also the leap into electronic
-          typesetting, remaining essentially unchanged. It was popularised in
-          the 1960s with the release of Letraset sheets containing Lorem Ipsum
-          passages, and more recently with desktop publishing software like
-          Aldus PageMaker including versions of Lorem Ipsum.
+          {{descricao}}
+        </div>
+        <div style="display:flex;justify-content:center;">
+
+          <GmapMap
+            :center="{ lat: atual.lat, lng: atual.lng }"
+            :zoom="11"
+            style="width:640px; height:360px;"
+          >
+            <GmapMarker
+              v-for="(m, index) in markers "
+              :key="index"
+              :position="m.position"
+              :clickable="true"
+              :draggable="true"
+              :icon="m.icon"
+              @click="center = m.position"
+            />
+          </GmapMap>
         </div>
       </div>
     </main>
@@ -59,15 +73,23 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
-      items: [],
+      items:[],
       hasPrev: false,
       hasNext: true,
-      url: "https://webhook.site/f1af49a7-f782-4c4f-a266-ec5e45cfd844",
+      markers: [],
+      atual: {},
+      descricao:'',
+      destino: { },
+      markers: [],
+      obj:{},
+      url: "http://ec2-3-93-44-66.compute-1.amazonaws.com:8080/api/attractions",
     };
   },
+  computed: {},
   methods: {
     prev() {
       this.$refs.horizontal.prev();
@@ -79,7 +101,47 @@ export default {
       this.hasPrev = hasPrev;
       this.hasNext = hasNext;
     },
-    fetchApi() {
+    pontos() {
+      this.markers = [
+        {
+          position: this.atual,
+          infoText: "<strong>Work</strong>",
+          icon: {
+            url: require("../assets/to_location.png"),
+            scaledSize: { width: 35, height: 35 },
+          },
+        },
+        {
+          position: this.destino,
+          infoText: "<strong>Home</strong>",
+          icon: {
+            url: require("../assets/from_location.png"),
+            scaledSize: { width: 35, height: 35 },
+          },
+        },
+      ];
+    },
+     posicaoAtual() {
+      navigator.geolocation.getCurrentPosition((position) => {
+        this.atual.lat =position.coords.latitude
+        this.atual.lng =position.coords.longitude
+      });
+      this.limparPontos()
+      this.pontos()
+       setTimeout(this.posicaoAtual, 5000)
+    },
+    limparPontos(){
+      this.markers=[]
+    },
+    listar(){
+      this.obj = JSON.parse(localStorage.getItem("objeto"));
+      this.items = this.obj.obj.photos
+      this.descricao =  this.obj.obj.description
+      this.destino = this.obj.obj.coordinates
+      this.posicaoAtual();
+
+    }
+    /* fetchApi() {
       fetch(this.url)
         .then((response) => response.json())
         .then((json) => {
@@ -89,16 +151,24 @@ export default {
         .catch((err) => {
           console.log("error", err);
         });
-    },
+    }, */
   },
   mounted() {
-    this.fetchApi();
+    this.listar()
+    /* this.fetchApi(); */
+    
+    /* this.initMap(); */
   },
 };
 </script>
 
 <!-- Content Design -->
 <style scoped>
+#map {
+  height: 500px;
+  width: 500px;
+  background-color: #d3d3d3;
+}
 .bodyRotas {
   padding-left: 10vw;
   padding-right: 10vw;
@@ -107,8 +177,7 @@ export default {
   background-color: #d3d3d3;
   border: solid 2px #6059c1;
   border-radius: 20px;
-  padding:15px;
-
+  padding: 15px;
 }
 .image {
   background-position: center !important;
@@ -192,8 +261,8 @@ button.inactive svg {
 button {
   padding: 4px;
   border-radius: 100px;
-  background-color:#6059c1;
-  border:solid;
+  background-color: #6059c1;
+  border: solid;
   margin-left: 20px;
   margin-right: 20px;
 }
@@ -224,24 +293,23 @@ main {
 }
 
 @media (max-width: 640px) {
-  .header{
+  .header {
     display: none;
   }
   .bodyRotas {
-  padding-left: 0;
-  padding-right: 0;
-}
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 @media (max-width: 768px) {
-
-  .header{
+  .header {
     display: none;
   }
   .bodyRotas {
-  padding-left: 0;
-  padding-right: 0;
-}
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 @media (min-width: 640px) {
   .horizontal {
