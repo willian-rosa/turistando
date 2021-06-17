@@ -7,6 +7,7 @@ namespace App\Models\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Intervention\Image\ImageManagerStatic as Image;
 
 trait UploadFiles
 {
@@ -44,9 +45,10 @@ trait UploadFiles
         }
     }
 
-    public function uploadFile(UploadedFile $file)
+    public function uploadFile($file)
     {
-        $file->store($this->uploadDir());
+        $image = Image::make($file['file']);
+        \Storage::disk()->put(($this->relativeFilePath($file['name'])), $image->stream());
     }
 
     public function deleteOldFiles()
@@ -66,17 +68,28 @@ trait UploadFiles
      */
     public function deleteFile($file)
     {
-        $filename = ($file instanceof UploadedFile)? $file->hashName() : $file;
-        \Storage::delete("{$this->uploadDir()}/{$filename}");
+        $filename = false;
+        if ($file instanceof UploadedFile) {
+            $filename = $file->hashName();
+        } elseif (is_array($file)) {
+            $filename = $file['name'];
+        }
+        $filename && \Storage::delete("{$this->uploadDir()}/{$filename}");
     }
 
     public static function extractFiles(array &$attributes = [])
     {
         $files = [];
         foreach (self::$fileFields as $fileField) {
-            if (isset($attributes[$fileField]) && $attributes[$fileField] instanceof UploadedFile) {
-                $files[] = $attributes[$fileField];
-                $attributes[$fileField] = $attributes[$fileField]->hashName();
+            if (isset($attributes[$fileField]) && \Str::startsWith($attributes[$fileField], 'data:image')) {
+
+                $name = uniqid() . '.' . explode('/', mime_content_type($attributes[$fileField]))[1];
+
+                $files[] = [
+                    'name' => $name,
+                    'file' => $attributes[$fileField]
+                ];
+                $attributes[$fileField] = $name;
             }
         }
         return $files;

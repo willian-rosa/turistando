@@ -25,6 +25,7 @@ services:
       ./.docker/entrypoint.sh
     environment:
       - _APP_ENV=local
+      - _APP_URL=http://localhost:8080
       - _DB_HOST=turistando_db
       - _DB_DATABASE=turistando
       - _DB_USERNAME=root

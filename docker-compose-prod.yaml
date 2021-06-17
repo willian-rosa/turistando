@@ -25,6 +25,7 @@ services:
       ./.docker/entrypoint.sh
     environment:
       - _APP_ENV=prodution
+      - _APP_URL=http://ec2-3-93-44-66.compute-1.amazonaws.com:8080
       - _DB_HOST=turistando_db
       - _DB_DATABASE=turistando
       - _DB_USERNAME=root
