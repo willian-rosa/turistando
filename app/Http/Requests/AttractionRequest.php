@@ -27,8 +27,8 @@ class AttractionRequest extends FormRequest
     {
         return [
              'name' => 'required|min:5|max:255',
-             'description' => 'required|min:5|max:255',
-             'coordinates' => 'required|min:5|max:255',
+             'description' => 'required|min:5',
+             'coordinates' => 'required|min:5',
         ];
     }
 
